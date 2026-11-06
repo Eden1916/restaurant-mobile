@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function Index() {
 
-  const [item, setItem] = useState([])
+  const [item, setItem] = useState<{id:string; name:string; price:number}[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
 
@@ -12,7 +12,7 @@ useEffect(() => {menuItems()}, [])
   fetch(`${process.env.EXPO_PUBLIC_API_URL}/menu`)
   .then((r)=>r.json())
   .then((d)=> {
-     setItem(menu=>d.length)
+     setItem(Array.isArray(d) ? d :[])
   })
   .catch(() => {
     console.log("you make mistake")
@@ -46,15 +46,24 @@ else if(error) {
     <View style={styles.box}>
       <Text style={styles.title}>Liyu Restaurant</Text>
       <Text style={styles.subtitle}>Authentic Ethiopian Cuisine</Text>
-      <Text>Item: {item}</Text>
+      <FlatList
+      data={item}
+      keyExtractor={(item) => item.id.toString()}
+      renderItem={({item}) => <View style={styles.card}>
+        <Text style={styles.menuName}>{item.name}</Text>
+        <Text>{item.price} ETB</Text>
+      </View>}/>
+      <Text style={styles.subtitle}>Item: {item.length}</Text>
     </View>
   )
 }
 const styles = StyleSheet.create({
-  box: {flex:1, alignItems:"center", justifyContent:"center" },
+  box: {flex:1, backgroundColor:"rgb(183, 181, 182)"},
   title: { color:"#450a05", fontWeight:"bold", fontSize:28 },
   subtitle: { color:"#464545"},
   button: { backgroundColor:"#9e5104", borderRadius:5, margin:7, padding:5},
   loading: {color:"#450a03"},
-  error: {color:"#900"}
+  error: {color:"#900"},
+  card: {backgroundColor:"white", justifyContent:"space-between", flexDirection:"row", padding:3, marginBottom:3},
+  menuName: {flex:1}
 })
