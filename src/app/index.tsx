@@ -15,6 +15,7 @@ export default function Index() {
   const [item, setItem] = useState<{id:string; name:string; price:number; image_url:string; description:string | null; category_name:string}[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [selectCategory, setSelectCategory] = useState("All")
 
 useEffect(() => {menuItems()}, [])
  function menuItems() {
@@ -22,19 +23,22 @@ useEffect(() => {menuItems()}, [])
   .then((r)=>r.json())
   .then((d)=> {
      setItem(Array.isArray(d) ? d :[])
-  })
-  .catch(() => {
-    console.log("you make mistake")
+  }
+)
+  .catch((err) => {
+    console.log(err.message)
     setError("Can't fetch the menu items!")
   })
   .finally(()=>setLoading(false))
 }
+
 
 function handleRetry(){
   setLoading(true)
   setError("")
   menuItems()
 }
+
 
 if(loading){
   return(
@@ -51,12 +55,33 @@ else if(error) {
     </View>
   )
 }
+     const visibleItems = selectCategory ==="All" ? item : item.filter((menu)=>menu.category_name === selectCategory)
+     console.log(visibleItems.length)
+     console.log("selected:", JSON.stringify(selectCategory))
+
   return (
     <View style={styles.main}>
       <Text style={styles.title}>Liyu Restaurant</Text>
       <Text style={styles.subtitle}>Authentic Ethiopian Cuisine</Text>
+      <View style={styles.buttons}>
+        <Pressable style={styles.categories} onPress={()=>setSelectCategory("All")}>
+          <Text>All</Text>
+        </Pressable>
+        <Pressable style={styles.categories} onPress={()=>setSelectCategory("Main Course")}>
+          <Text>Main Course</Text>
+        </Pressable>
+        <Pressable style={styles.categories} onPress={()=>setSelectCategory("Appetizers")}>
+          <Text>Appetizer</Text>
+        </Pressable>
+        <Pressable style={styles.categories} onPress={()=>setSelectCategory("Desserts")}>
+          <Text>Desserts</Text>
+        </Pressable>
+        <Pressable style={styles.categories} onPress={()=>setSelectCategory("Beverages")}>
+          <Text>Beverages</Text>
+        </Pressable>
+      </View>
       <FlatList
-      data={item}
+      data={visibleItems}
       keyExtractor={(item) => item.id.toString()}
       renderItem={({item}) => {
       const photo = getImageUrl(item.image_url);
@@ -78,6 +103,8 @@ const styles = StyleSheet.create({
   main: {flex:1, backgroundColor:"rgb(183, 181, 182)"},
   title: { color:"#450a05", fontWeight:"bold", fontSize:28, textAlign:"center" },
   subtitle: { color:"#464545", textAlign:"center"},
+  buttons: {flexDirection:"row"},
+  categories: {backgroundColor:"rgb(127, 44, 5)", color:"white", padding:5, margin:5, borderRadius:5, justifyContent:"center", alignItems:"center"},
   button: { backgroundColor:"#9e5104", borderRadius:5, margin:7, padding:5, textAlign:"center"},
   loading: {color:"#450a03"},
   error: {color:"#900", textAlign:"center"},
