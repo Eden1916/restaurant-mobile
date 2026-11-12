@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function Index() {
 
@@ -15,7 +15,7 @@ export default function Index() {
   const [item, setItem] = useState<{id:string; name:string; price:number; image_url:string; description:string | null; category_name:string}[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-  const [selectCategory, setSelectCategory] = useState("All")
+  const [selectedCategory, setSelectedCategory] = useState("All")
 
 useEffect(() => {menuItems()}, [])
  function menuItems() {
@@ -55,30 +55,29 @@ else if(error) {
     </View>
   )
 }
-     const visibleItems = selectCategory ==="All" ? item : item.filter((menu)=>menu.category_name === selectCategory)
+     const visibleItems = selectedCategory ==="All" ? item : item.filter((menu)=>menu.category_name === selectedCategory)
      console.log(visibleItems.length)
-     console.log("selected:", JSON.stringify(selectCategory))
+     console.log("selected:", JSON.stringify(selectedCategory))
+
+     const categories = Array.from(new Set(item.map((category)=>category.category_name)))
+     categories.unshift("All")
+
+     console.log(categories)
 
   return (
     <View style={styles.main}>
       <Text style={styles.title}>Liyu Restaurant</Text>
       <Text style={styles.subtitle}>Authentic Ethiopian Cuisine</Text>
       <View style={styles.buttons}>
-        <Pressable style={styles.categories} onPress={()=>setSelectCategory("All")}>
-          <Text>All</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {categories.map((category)=>{
+            const isSelected = category === selectedCategory
+            return(
+        <Pressable style={[styles.categories, isSelected && styles.categoriesSelected]} key={category} onPress={()=>setSelectedCategory(category)}>
+          <Text style = {[styles.categoriesText, isSelected && styles.categoriesSelectedText]}>{category}</Text>
         </Pressable>
-        <Pressable style={styles.categories} onPress={()=>setSelectCategory("Main Course")}>
-          <Text>Main Course</Text>
-        </Pressable>
-        <Pressable style={styles.categories} onPress={()=>setSelectCategory("Appetizers")}>
-          <Text>Appetizer</Text>
-        </Pressable>
-        <Pressable style={styles.categories} onPress={()=>setSelectCategory("Desserts")}>
-          <Text>Desserts</Text>
-        </Pressable>
-        <Pressable style={styles.categories} onPress={()=>setSelectCategory("Beverages")}>
-          <Text>Beverages</Text>
-        </Pressable>
+        )})}
+        </ScrollView>
       </View>
       <FlatList
       data={visibleItems}
@@ -92,6 +91,9 @@ else if(error) {
         <Text style={styles.menuName}>{item.name}</Text>
         <Text style={styles.description} numberOfLines={2}>{item.description}</Text>
         <Text style={styles.price}>{item.price} ETB</Text>
+        <Pressable style={styles.order}>
+          <Text>Order Now</Text>
+        </Pressable>
         </View>
       </View>)
     }}/>
@@ -104,7 +106,7 @@ const styles = StyleSheet.create({
   title: { color:"#450a05", fontWeight:"bold", fontSize:28, textAlign:"center" },
   subtitle: { color:"#464545", textAlign:"center"},
   buttons: {flexDirection:"row"},
-  categories: {backgroundColor:"rgb(127, 44, 5)", color:"white", padding:5, margin:5, borderRadius:5, justifyContent:"center", alignItems:"center"},
+  categories: {backgroundColor:"rgb(100, 35, 5)", padding:5, margin:5, borderRadius:5, justifyContent:"center", alignItems:"center"},
   button: { backgroundColor:"#9e5104", borderRadius:5, margin:7, padding:5, textAlign:"center"},
   loading: {color:"#450a03"},
   error: {color:"#900", textAlign:"center"},
@@ -113,5 +115,9 @@ const styles = StyleSheet.create({
   menuName: {flex:1, fontWeight:"bold", fontSize:18, textAlign:"center"},
   menuImage: {width:150, height:100, borderRadius:5, resizeMode:"cover"},
   description: {color:"#3a3939", textAlign:"center", flex:1},
-  price: {textAlign:"center", fontWeight:"bold", color:"rgb(60, 3, 3)"}
+  price: {textAlign:"center", fontWeight:"bold", color:"rgb(60, 3, 3)"},
+  order: {alignItems:"center", backgroundColor:"rgb(219, 127, 46)", color:"white", borderRadius:5, alignSelf:"center", paddingHorizontal:6, marginTop:10 },
+  categoriesSelected: {backgroundColor:"rgb(127, 44, 5)"},
+  categoriesText: {color:"white", fontWeight:"bold"},
+  categoriesSelectedText: {color:"black"}
 })
