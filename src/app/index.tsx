@@ -1,17 +1,9 @@
+import { getImageUrl } from '@/utils/images';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function Index() {
-
-  const API_BASE = (process.env.EXPO_PUBLIC_API_URL ?? '').replace('/api', '')
-
-  function getImageUrl(image_url:string | null) {
-    if(!image_url) return undefined;
-    if(image_url.startsWith("/uploads/")) return `${API_BASE}${image_url}`;
-    return image_url;
-  }
-
 
   const [item, setItem] = useState<{id:string; name:string; price:number; image_url:string; description:string | null; category_name:string}[]>([])
   const [loading, setLoading] = useState(true)
@@ -57,14 +49,13 @@ else if(error) {
     </View>
   )
 }
+//when a ctegory is clicked the menu items under that category will be visible
      const visibleItems = selectedCategory ==="All" ? item : item.filter((menu)=>menu.category_name === selectedCategory)
-     console.log(visibleItems.length)
-     console.log("selected:", JSON.stringify(selectedCategory))
 
+     //the category name form the database to have a button the the screen
      const categories = Array.from(new Set(item.map((category)=>category.category_name)))
      categories.unshift("All")
 
-     console.log(categories)
 
   return (
     <View style={styles.main}>
