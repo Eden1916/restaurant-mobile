@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
@@ -16,6 +17,7 @@ export default function Index() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("All")
+  const router = useRouter()
 
 useEffect(() => {menuItems()}, [])
  function menuItems() {
@@ -85,17 +87,16 @@ else if(error) {
       renderItem={({item}) => {
       const photo = getImageUrl(item.image_url);
       return(
+        <Pressable onPress={() => router.push({pathname: "/dish/[id]", params:{id:item.id}})}>
       <View style={styles.card}>
         <Image source={photo ? {uri:photo} : undefined} style={styles.menuImage}/>
         <View style={styles.info}>
         <Text style={styles.menuName}>{item.name}</Text>
         <Text style={styles.description} numberOfLines={2}>{item.description}</Text>
         <Text style={styles.price}>{item.price} ETB</Text>
-        <Pressable style={styles.order}>
-          <Text>Order Now</Text>
-        </Pressable>
         </View>
-      </View>)
+      </View>
+      </Pressable>)
     }}/>
     </View>
   )
