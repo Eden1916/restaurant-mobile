@@ -1,6 +1,6 @@
 import { menuItems } from "@/types";
 import { getImageUrl } from "@/utils/images";
-import { useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 export default function DishDetail(){
@@ -58,6 +58,8 @@ if (!dish) {
 const image = getImageUrl(dish.image_url)
 
 return (
+  <>
+  <Stack.Screen options={{title:dish.name}}/>
   <ScrollView style={styles.container}>
     <Image source={{ uri: image }} style={styles.image} />
     <Text style={styles.title}>{dish.name}</Text>
@@ -66,6 +68,7 @@ return (
     <Text style={styles.price}>{dish.price} ETB</Text>
     
   </ScrollView>
+  </>
 )
 }
 const styles = StyleSheet.create({
